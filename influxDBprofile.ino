@@ -60,3 +60,43 @@
     }
   }
   void loop() {}
+
+//
+// aditional code fo write data
+//
+void setup() {
+    // ... code in setup() from Initialize Client
+   
+    // Add tags to the data point
+    sensor.addTag("device", DEVICE);
+    sensor.addTag("SSID", WiFi.SSID());
+   }
+
+void loop() {
+    // Clear fields for reusing the point. Tags will remain the same as set above.
+    sensor.clearFields();
+  
+    // Store measured value into point
+    // Report RSSI of currently connected network
+    sensor.addField("rssi", WiFi.RSSI());
+  
+    // Print what are we exactly writing
+    Serial.print("Writing: ");
+    Serial.println(sensor.toLineProtocol());
+  
+    // Check WiFi connection and reconnect if needed
+    if (wifiMulti.run() != WL_CONNECTED) {
+      Serial.println("Wifi connection lost");
+    }
+  
+    // Write point
+    if (!client.writePoint(sensor)) {
+      Serial.print("InfluxDB write failed: ");
+      Serial.println(client.getLastErrorMessage());
+    }
+  
+    Serial.println("Waiting 1 second");
+    delay(1000);
+    }
+
+
